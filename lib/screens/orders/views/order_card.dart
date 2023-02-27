@@ -88,8 +88,7 @@ class _OrderCardState extends State<OrderCard> {
                   },
                   onSelected: (val) async {
                     context.loaderOverlay.show();
-                    bool changed =
-                        await widget.controller.changeOrderStatus(widget.order.id, val);
+                    bool changed = await widget.controller.changeOrderStatus(widget.order.id, val);
                     context.loaderOverlay.hide();
                     if (changed) {
                       setState(() {
