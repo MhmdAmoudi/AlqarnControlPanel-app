@@ -132,7 +132,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
     } on ResponseError catch (e) {
       completed = false;
       hasMore = false;
-      noMoreItems = e.error;
+      noMoreItems = e.message;
     }
     if (mounted) {
       setState(() {

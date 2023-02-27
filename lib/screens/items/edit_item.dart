@@ -105,7 +105,7 @@ class EditItem extends StatelessWidget {
                             context.loaderOverlay.hide();
                             showSnackBar(
                               title: 'فشل إلغاء تفعيل المنتج',
-                              message: e.error,
+                              message: e.message,
                               type: AlertType.failure,
                             );
                           }
@@ -139,7 +139,7 @@ class EditItem extends StatelessWidget {
                             context.loaderOverlay.hide();
                             showSnackBar(
                               title: 'فشل تفعيل المنتج',
-                              message: e.error,
+                              message: e.message,
                               type: AlertType.failure,
                             );
                           }
@@ -168,7 +168,7 @@ class EditItem extends StatelessWidget {
                       context.loaderOverlay.hide();
                       showSnackBar(
                         title: 'فشل حذف المنتج',
-                        message: e.error,
+                        message: e.message,
                         type: AlertType.failure,
                       );
                     }

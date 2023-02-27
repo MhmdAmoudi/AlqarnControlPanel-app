@@ -16,7 +16,7 @@ import 'show_item.dart';
 
 class Items extends StatelessWidget {
   const Items({Key? key}) : super(key: key);
-  static final API _api = API('Item', isFile: true);
+  static final API _api = API('Item', withFile: true);
   static final List<ItemModel> _items = [];
 
   @override

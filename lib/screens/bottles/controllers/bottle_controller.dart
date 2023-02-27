@@ -37,7 +37,7 @@ class BottleController {
       } else {
         showSnackBar(
           title: 'فشل إضافة الحجم $size $unit',
-          message: e.error,
+          message: e.message,
           type: AlertType.failure,
         );
       }
@@ -65,7 +65,7 @@ class BottleController {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل تعديل الحجم ${bottle.size} ${bottle.unit}',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
       return false;
@@ -84,7 +84,7 @@ class BottleController {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل حذف الحجم ${bottle.size} ${bottle.unit}',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
       return false;

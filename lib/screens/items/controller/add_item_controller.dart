@@ -13,7 +13,7 @@ import '../models/item_images.dart';
 import '../models/more_detail.dart';
 
 class AddItemController {
-  final API _api = API('Item', isFile: true);
+  final API _api = API('Item', withFile: true);
 
   final TextEditingController name = TextEditingController();
   final TextEditingController description = TextEditingController();
@@ -83,7 +83,7 @@ class AddItemController {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل إضافة المنتج ${name.text.trim()}',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
     }

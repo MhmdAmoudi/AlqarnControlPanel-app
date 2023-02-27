@@ -16,7 +16,7 @@ class API {
 
   API(
     String controller, {
-    bool isFile = false,
+    bool withFile = false,
   }) {
     _dio = Dio(
       BaseOptions(
@@ -27,11 +27,11 @@ class API {
           'Authorization': 'Bearer $token',
         },
         connectTimeout: 15000,
-        sendTimeout: 15000,
-        receiveTimeout: 15000,
+        sendTimeout: 30000,
+        receiveTimeout: 30000,
       ),
     );
-    if (isFile) {
+    if (withFile) {
       _dioFile = Dio(
         BaseOptions(
           baseUrl: '$baseUrl$controller/',
@@ -65,14 +65,14 @@ class API {
     } on DioError catch (e) {
       print(e);
       ResponseError error = ResponseError(
-        error: 'حصل خطأ ما',
+        message: 'حصل خطأ ما',
         type: ErrorType.other,
       );
       switch (e.type) {
         case DioErrorType.connectTimeout:
         case DioErrorType.sendTimeout:
         case DioErrorType.receiveTimeout:
-          error.error = 'انتهت مهلة الإتصال يرجى إعادة المحاولة';
+          error.message = 'انتهت مهلة الإتصال يرجى إعادة المحاولة';
           error.type = ErrorType.connection;
           break;
         case DioErrorType.response:
@@ -82,7 +82,7 @@ class API {
                 refreshToken(e.response?.data['refreshToken']);
               }
               if (e.response?.data['message'] != null) {
-                error.error = e.response?.data['message'];
+                error.message = e.response?.data['message'];
               }
               error.type = ErrorType.custom;
               break;
@@ -92,18 +92,18 @@ class API {
               unauthorizedReset();
               break;
             case 500:
-              error.error = "خطأ في الوجهة حاول مرة أخرى بعد لحظات";
+              error.message = "خطأ في الوجهة حاول مرة أخرى بعد لحظات";
               error.type = ErrorType.server;
               break;
           }
-          error.error = '${e.response?.statusCode} - ${error.error}';
+          error.message = '${e.response?.statusCode} - ${error.message}';
           break;
         case DioErrorType.other:
-          error.error = 'لا يوجد اتصال بالإنترنت';
+          error.message = 'لا يوجد اتصال بالإنترنت';
           error.type = ErrorType.connection;
           break;
         case DioErrorType.cancel:
-          error.error = 'تم قطع الإتصال !';
+          error.message = 'تم قطع الإتصال !';
           error.type = ErrorType.connection;
           break;
       }
@@ -111,7 +111,7 @@ class API {
     } catch (e) {
       print(e);
       throw ResponseError(
-        error: 'حصل خطأ ما',
+        message: 'حصل خطأ ما',
         type: ErrorType.other,
       );
     }

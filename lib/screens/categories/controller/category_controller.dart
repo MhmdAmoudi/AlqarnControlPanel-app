@@ -11,7 +11,7 @@ import '../../../widgets/animated_snackbar.dart';
 import '../model/category_data.dart';
 
 class CategoryController {
-  final API _api = API('Category', isFile: true);
+  final API _api = API('Category', withFile: true);
 
   List<CategoryData> categories = [];
 
@@ -62,7 +62,7 @@ class CategoryController {
       } else {
         showSnackBar(
           title: 'فشل إضافة الفئة $name',
-          message: e.error,
+          message: e.message,
           type: AlertType.failure,
         );
       }
@@ -91,7 +91,7 @@ class CategoryController {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل تعديل الفئة ${category.name}',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
       return false;
@@ -110,7 +110,7 @@ class CategoryController {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل حذف ${category.name}',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
       return false;

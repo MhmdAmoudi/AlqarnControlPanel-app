@@ -123,7 +123,7 @@ class _EditBottlesState extends State<EditBottles> {
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل التعديل',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
     }

@@ -9,7 +9,7 @@ import '../models/item_category.dart';
 import '../models/item_data.dart';
 
 class ItemController {
-  static final API _api = API('Item', isFile: true);
+  static final API _api = API('Item', withFile: true);
 
   List<ItemCategory> categories = [];
 

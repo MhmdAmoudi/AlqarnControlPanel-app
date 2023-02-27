@@ -1,3 +1,6 @@
+import 'package:manage/api/response_error.dart';
+import 'package:manage/widgets/animated_snackbar.dart';
+
 import '../../../api/api.dart';
 import '../models/order_view.dart';
 
@@ -15,6 +18,19 @@ class OrderController {
       return OrderBillItem.fromJson(data);
     } catch (_) {
       return null;
+    }
+  }
+
+  Future<bool> changeOrderState(int state) async {
+    try {
+      return await _api.post('ChangeOrderState', data: state);
+    } on ResponseError catch (e) {
+      showSnackBar(
+        title: 'فشل تغيير الحالة',
+        message: e.message,
+        type: AlertType.failure,
+      );
+      return false;
     }
   }
 }

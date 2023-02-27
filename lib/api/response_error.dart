@@ -1,9 +1,9 @@
 class ResponseError {
-  String error;
+  String message;
   ErrorType type;
 
   ResponseError({
-    required this.error,
+    required this.message,
     required this.type,
   });
 }

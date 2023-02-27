@@ -27,7 +27,7 @@ class Countries extends StatefulWidget {
 }
 
 class _CountriesState extends State<Countries> {
-  final API api = API('Location', isFile: true);
+  final API api = API('Location', withFile: true);
   late Future<List<Country>> getCountries;
 
   @override
@@ -261,7 +261,7 @@ class _CountriesState extends State<Countries> {
       return await api.postFile('AddCountry', data: form);
     } on ResponseError catch (e) {
       showSnackBar(
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
       return false;

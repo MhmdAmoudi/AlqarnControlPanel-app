@@ -35,7 +35,7 @@ class EditImages extends StatefulWidget {
 }
 
 class _EditImagesState extends State<EditImages> {
-  final API api = API('Item', isFile: true);
+  final API api = API('Item', withFile: true);
 
   late ImageData mainImage;
   late List<ImageData> images;
@@ -285,7 +285,7 @@ class _EditImagesState extends State<EditImages> {
     } on ResponseError catch (e) {
       context.loaderOverlay.hide();
       showSnackBar(
-          title: 'فشل الإضافة', message: e.error, type: AlertType.failure);
+          title: 'فشل الإضافة', message: e.message, type: AlertType.failure);
     }
   }
 }

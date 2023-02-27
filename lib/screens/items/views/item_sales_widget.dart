@@ -72,7 +72,7 @@ class _ItemSalesWidgetState extends State<ItemSalesWidget> {
                   getSales = getItemSales();
                 });
               },
-              child: Text((snapshot.error as ResponseError).error),
+              child: Text((snapshot.error as ResponseError).message),
             ),
           );
         }

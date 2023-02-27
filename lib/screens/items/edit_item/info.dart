@@ -108,7 +108,7 @@ class _EditInfoState extends State<EditInfo> {
         context.loaderOverlay.hide();
         showSnackBar(
           title: 'فشل التعديل',
-          message: e.error,
+          message: e.message,
           type: AlertType.success,
         );
       }

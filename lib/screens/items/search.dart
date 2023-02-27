@@ -20,7 +20,7 @@ class ItemSearch extends StatefulWidget {
 }
 
 class _ItemSearchState extends State<ItemSearch> {
-  final API _api = API('Item', isFile: true);
+  final API _api = API('Item', withFile: true);
 
   final List<ItemModel> _items = [];
 

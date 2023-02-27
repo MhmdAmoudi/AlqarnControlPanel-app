@@ -29,7 +29,7 @@ class ErrorHandler extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
-                  error is ResponseError ? error.error : '000 - حصل خطأ ما ',
+                  error is ResponseError ? error.message : '000 - حصل خطأ ما ',
                   style: const TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),

@@ -300,7 +300,7 @@ class _UsersState extends State<Users> {
                             } on ResponseError catch (e) {
                               showSnackBar(
                                 title: 'فشل الإضافة',
-                                message: e.error,
+                                message: e.message,
                                 type: AlertType.failure,
                               );
                               setState(() {

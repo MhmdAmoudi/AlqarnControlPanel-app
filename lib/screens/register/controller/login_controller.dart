@@ -46,7 +46,7 @@ class LoginController {
       context.loaderOverlay.hide();
       showSnackBar(
         title: 'فشل تسجيل الدخول',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
     }

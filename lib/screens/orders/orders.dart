@@ -35,7 +35,7 @@ class _OrdersState extends State<Orders> {
           drawer: const MenuDrawer(),
           body: InfiniteList<OrderView>(
             items: orders,
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             getItems: controller.getOrders,
             child: (index) => OrderCard(orders[index], controller),
           ),

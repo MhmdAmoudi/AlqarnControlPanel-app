@@ -107,7 +107,7 @@ class _EditCategoriesState extends State<EditCategories> {
       context.loaderOverlay.hide();
       showSnackBar(
         title: 'فشل التعديل',
-        message: e.error,
+        message: e.message,
         type: AlertType.failure,
       );
     }

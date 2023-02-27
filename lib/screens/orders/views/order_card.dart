@@ -1,6 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:manage/widgets/animated_snackbar.dart';
 
 import '../../../utilities/appearance/style.dart';
 import '../../../widgets/money_text.dart';
@@ -8,38 +10,36 @@ import '../controller/controller.dart';
 import '../models/order_view.dart';
 
 class OrderCard extends StatefulWidget {
-  const OrderCard(this.order, this.controller, {Key? key}) : super(key: key);
   final OrderView order;
   final OrderController controller;
+
+  const OrderCard(this.order, this.controller, {Key? key}) : super(key: key);
 
   @override
   State<OrderCard> createState() => _OrderCardState();
 }
 
 class _OrderCardState extends State<OrderCard> {
-
   late final Color statusColor;
   late final String statusLabel;
   late final Icon statusIcon;
 
   @override
   void initState() {
-    statusColor = OrderStatus.color(widget.order.status);
-    statusLabel = OrderStatus.label(widget.order.status);
-    statusIcon = OrderStatus.icon(widget.order.status);
+    changeState();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: statusColor.withOpacity(0.1))
-      ),
-      margin: const EdgeInsets.all(20),
+          side: BorderSide(color: statusColor.withOpacity(0.1))),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.only(top: 15, bottom: 15, right: 15),
             decoration: BoxDecoration(
               color: AppColors.darkMainColor,
               border: Border.all(color: statusColor, width: 0.1),
@@ -76,6 +76,35 @@ class _OrderCardState extends State<OrderCard> {
                     ),
                   ),
                 ),
+                PopupMenuButton(
+                  color: statusColor,
+                  itemBuilder: (BuildContext context) {
+                    return const [
+                      PopupMenuItem(
+                          value: 2, child: Text('تأكيد الشراء وجار التوصيل')),
+                      PopupMenuItem(value: 1, child: Text('تأكيد تسليم الطلب')),
+                      PopupMenuItem(value: 0, child: Text('رفض الطلب')),
+                    ];
+                  },
+                  onSelected: (val) async {
+                    context.loaderOverlay.show();
+                    bool changed =
+                        await widget.controller.changeOrderState(val);
+                    context.loaderOverlay.hide();
+                    if (changed) {
+                      setState(() {
+                        changeState();
+                      });
+                      if (val == 0) {
+                        showSnackBar(
+                            message: 'تم رفض الطلب', type: AlertType.success);
+                      } else {
+                        showSnackBar(
+                            message: 'تم تأكيد الطلب', type: AlertType.success);
+                      }
+                    }
+                  },
+                )
               ],
             ),
           ),
@@ -144,19 +173,24 @@ class _OrderCardState extends State<OrderCard> {
                     Obx(
                       () => widget.order.loadingBill.value
                           ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                    Text('جارٍ التحميل', style: TextStyle(color: Colors.grey),),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'جارٍ التحميل',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
                                     SizedBox(width: 10),
                                     SizedBox(
                                       height: 10,
                                       width: 10,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
                                     ),
                                   ]),
-                          )
+                            )
                           : TextButton.icon(
                               label: Text(widget.order.isOpen
                                   ? 'إخفاء التفاصيل'
@@ -175,7 +209,8 @@ class _OrderCardState extends State<OrderCard> {
                                     return;
                                   }
                                   widget.order.loadingBill(true);
-                                  widget.order.bill = await widget.controller.getOrderBill(widget.order.id);
+                                  widget.order.bill = await widget.controller
+                                      .getOrderBill(widget.order.id);
                                   widget.order.loadingBill(false);
                                   if (widget.order.bill != null) {
                                     setState(() {
@@ -444,5 +479,11 @@ class _OrderCardState extends State<OrderCard> {
         )
       ],
     );
+  }
+
+  void changeState() {
+    statusColor = OrderStatus.color(widget.order.status);
+    statusLabel = OrderStatus.label(widget.order.status);
+    statusIcon = OrderStatus.icon(widget.order.status);
   }
 }
