@@ -26,7 +26,7 @@ class _OrderCardState extends State<OrderCard> {
 
   @override
   void initState() {
-    changeState();
+    changeStatus(widget.order.status);
     super.initState();
   }
 
@@ -89,11 +89,11 @@ class _OrderCardState extends State<OrderCard> {
                   onSelected: (val) async {
                     context.loaderOverlay.show();
                     bool changed =
-                        await widget.controller.changeOrderState(val);
+                        await widget.controller.changeOrderStatus(val);
                     context.loaderOverlay.hide();
                     if (changed) {
                       setState(() {
-                        changeState();
+                        changeStatus(val);
                       });
                       if (val == 0) {
                         showSnackBar(
@@ -481,9 +481,9 @@ class _OrderCardState extends State<OrderCard> {
     );
   }
 
-  void changeState() {
-    statusColor = OrderStatus.color(widget.order.status);
-    statusLabel = OrderStatus.label(widget.order.status);
-    statusIcon = OrderStatus.icon(widget.order.status);
+  void changeStatus(int status) {
+    statusColor = OrderStatus.color(status);
+    statusLabel = OrderStatus.label(status);
+    statusIcon = OrderStatus.icon(status);
   }
 }

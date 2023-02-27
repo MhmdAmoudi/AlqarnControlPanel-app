@@ -21,7 +21,7 @@ class OrderController {
     }
   }
 
-  Future<bool> changeOrderState(int state) async {
+  Future<bool> changeOrderStatus(int state) async {
     try {
       return await _api.post('ChangeOrderState', data: state);
     } on ResponseError catch (e) {
