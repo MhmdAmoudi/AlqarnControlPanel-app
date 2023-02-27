@@ -21,9 +21,9 @@ class OrderController {
     }
   }
 
-  Future<bool> changeOrderStatus(int state) async {
+  Future<bool> changeOrderStatus(String id, int status) async {
     try {
-      return await _api.post('ChangeOrderState', data: state);
+      return await _api.post('ChangeOrderStatus', data: {id: status});
     } on ResponseError catch (e) {
       showSnackBar(
         title: 'فشل تغيير الحالة',
