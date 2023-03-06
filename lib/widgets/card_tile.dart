@@ -6,8 +6,8 @@ import 'animated_snackbar.dart';
 import 'custom_alert_dialog.dart';
 
 class CardTile extends StatelessWidget {
-  const CardTile({
-    Key? key,
+  CardTile({
+    super.key,
     required this.leading,
     required this.title,
     required this.subtitle,
@@ -17,7 +17,13 @@ class CardTile extends StatelessWidget {
     required this.onEditPressed,
     this.onDeletePressed,
     this.onActivePressed,
-  }) : super(key: key);
+  }) {
+    if (onDeletePressed == null) {
+      extentRatio = 0.3;
+    } else {
+      extentRatio = 0.5;
+    }
+  }
 
   final Widget leading;
   final String title;
@@ -28,6 +34,7 @@ class CardTile extends StatelessWidget {
   final void Function() onEditPressed;
   final void Function()? onDeletePressed;
   final void Function(bool)? onActivePressed;
+  late final double extentRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +90,7 @@ class CardTile extends StatelessWidget {
               )
             : null,
         endActionPane: ActionPane(
+          extentRatio: extentRatio,
           motion: const DrawerMotion(),
           children: [
             if (onDeletePressed != null)

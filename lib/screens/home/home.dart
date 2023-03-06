@@ -5,22 +5,22 @@ import '../../widgets/drawer/sections_drawer.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
+  static bool _exit = false;
 
   @override
   Widget build(BuildContext context) {
-    bool exit = false;
     return SafeArea(
       child: WillPopScope(
         onWillPop: () async {
-          if (exit) {
+          if (_exit) {
             return true;
           } else {
             Fluttertoast.showToast(msg: 'اضغط مره أخرى للخروج');
-            exit = true;
+            _exit = true;
             Future.delayed(
               const Duration(seconds: 3),
               () {
-                exit = false;
+                _exit = false;
               },
             );
             return false;
@@ -31,6 +31,9 @@ class Home extends StatelessWidget {
             title: const Text('الرئيسية'),
           ),
           drawer: const MenuDrawer(),
+          body: ListView(
+            children: [],
+          ),
         ),
       ),
     );

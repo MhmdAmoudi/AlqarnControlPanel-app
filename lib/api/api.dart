@@ -12,12 +12,9 @@ class API {
 
   static String? token;
 
-  static late final String baseUrl;
+  static late String baseUrl;
 
-  API(
-    String controller, {
-    bool withFile = false,
-  }) {
+  API(String controller, {bool withFile = false}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: '$baseUrl$controller/',
@@ -47,9 +44,9 @@ class API {
   }
 
   static void refreshToken(String newToken) async {
+    token = newToken;
     const FlutterSecureStorage storage = FlutterSecureStorage();
     await storage.write(key: 'refreshToken', value: token);
-    token = newToken;
   }
 
   Future<dynamic> _apiRequest(Future<Response> Function() request) async {

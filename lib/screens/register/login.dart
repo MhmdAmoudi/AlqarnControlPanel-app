@@ -17,7 +17,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final LoginController controller = LoginController();
-  final TextEditingController userId = TextEditingController();
+  final TextEditingController username = TextEditingController();
+  final TextEditingController password = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
@@ -57,14 +58,27 @@ class _LoginState extends State<Login> {
                 child: ListView(
                   padding: const EdgeInsets.all(15),
                   children: [
-                    const SizedBox(height: 15),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: CustomTextFormField(
+                        controller: username,
+                        labelText: 'Username',
+                        hintText: 'enter username id',
+                        prefixIcon: Icons.person,
+                        validator: (val) {
+                          if (val!.trim().isEmpty) return 'enter username';
+                          return null;
+                        },
+                      ),
+                    ),
                     CustomTextFormField(
-                      controller: userId,
-                      labelText: 'User Id',
-                      hintText: 'enter user id',
-                      prefixIcon: Icons.person,
+                      controller: password,
+                      labelText: 'Password',
+                      hintText: 'enter password',
+                      prefixIcon: Icons.password_rounded,
+                      obscureText: true,
                       validator: (val) {
-                        if (val!.trim().isEmpty) return 'enter user id';
+                        if (val!.isEmpty) return 'enter password';
                         return null;
                       },
                     ),
@@ -72,7 +86,11 @@ class _LoginState extends State<Login> {
                     ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          controller.login(context, userId.text.trim());
+                          controller.login(
+                            context,
+                            username.text.trim(),
+                            password.text,
+                          );
                         }
                       },
                       child: const Text('Login'),

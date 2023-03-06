@@ -14,15 +14,13 @@ import '../../home/home.dart';
 class LoginController {
   final API _api = API('Login');
 
-  Future<void> login(BuildContext context, String token) async {
+  Future<void> login(
+      BuildContext context, String username, String password) async {
     context.loaderOverlay.show();
     try {
-      bool exist = await _api.post('Login', data: token);
+      bool exist = await _api.post('Login', data: {username: password});
       if (exist) {
         try {
-          const FlutterSecureStorage storage = FlutterSecureStorage();
-          await storage.write(key: 'refreshToken', value: token);
-          API.token = token;
           MenuDrawer.extractUserInfo();
           context.loaderOverlay.hide();
           Get.off(() => const Home());
@@ -69,12 +67,11 @@ class LoginController {
                   type: AlertType.warning,
                   title: 'إعادة تسجيل الدخول',
                   content:
-                  'يتم طلب تسجيل الدخول إلى حسابك مرة أخرى حسب الحالات التالية:\n1- تم تسجيل الدخول بحسابك هذا في جهاز آخر.\n2- مرت فترة منذ أن قمت بالدخول إلى حسابك على هذا الجهاز.',
+                      'يتم طلب تسجيل الدخول إلى حسابك مرة أخرى حسب الحالات التالية:\n1- تم تسجيل الدخول بحسابك هذا في جهاز آخر.\n2- مرت فترة منذ أن قمت بالدخول إلى حسابك على هذا الجهاز.',
                   confirmBackgroundColor: AppColors.subColor,
                   confirmText: 'فهمت',
                   onConfirmPressed: () => Get.back(),
-                  showCancelButton: false
-              );
+                  showCancelButton: false);
             },
             child: const Text(
               'لماذا ظهر هذا التنبيه؟',

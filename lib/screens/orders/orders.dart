@@ -31,6 +31,12 @@ class _OrdersState extends State<Orders> {
         child: Scaffold(
           appBar: AppBar(
             title: const Text('الطلبات'),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.search_rounded),
+              )
+            ],
           ),
           drawer: const MenuDrawer(),
           body: InfiniteList<OrderView>(

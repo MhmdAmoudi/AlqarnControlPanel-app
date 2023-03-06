@@ -14,10 +14,17 @@ import 'models/item_model.dart';
 import 'search.dart';
 import 'show_item.dart';
 
-class Items extends StatelessWidget {
+class Items extends StatefulWidget {
   const Items({Key? key}) : super(key: key);
-  static final API _api = API('Item', withFile: true);
-  static final List<ItemModel> _items = [];
+
+  @override
+  State<Items> createState() => _ItemsState();
+}
+
+class _ItemsState extends State<Items> {
+  final API _api = API('Item', withFile: true);
+
+  final List<ItemModel> _items = [];
 
   @override
   Widget build(BuildContext context) {
@@ -48,40 +55,46 @@ class Items extends StatelessWidget {
             items: _items,
             getItems: (List<String> sentItemsIds) => getItems(sentItemsIds),
             child: (int index) => CardTile(
-              leading: _items[index].haveImage
-                  ? DownloadImage(
-                      parent: (image) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.file(
-                            image,
-                            fit: BoxFit.cover,
-                            height: 40,
-                            width: 40,
-                          ),
-                        );
-                      },
-                      getImage: () =>
-                          ItemController.getItemMainImage(_items[index].id),
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(5),
-                      child: Image.asset(
-                        'asset/icons/alqaren.png',
-                        fit: BoxFit.cover,
-                        height: 40,
-                        width: 40,
+                leading: _items[index].haveImage
+                    ? DownloadImage(
+                        parent: (image) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.file(
+                              image,
+                              fit: BoxFit.cover,
+                              height: 40,
+                              width: 40,
+                            ),
+                          );
+                        },
+                        getImage: () =>
+                            ItemController.getItemMainImage(_items[index].id),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(5),
+                        child: Image.asset(
+                          'asset/icons/alqaren.png',
+                          fit: BoxFit.cover,
+                          height: 40,
+                          width: 40,
+                        ),
                       ),
-                    ),
-              title: _items[index].name,
-              subtitle:
-                  '${_items[index].quantity} حبة - ${_items[index].createdAt}',
-              subtitleColor: _items[index].quantity > 0 ? null : Colors.red,
-              isActive: _items[index].isActive,
-              onTap: () =>
-                  Get.to(() => ShowItem(_items[index].id, _items[index].name)),
-              onEditPressed: () => Get.to(() => EditItem(_items[index])),
-            ),
+                title: _items[index].name,
+                subtitle:
+                    '${_items[index].quantity} حبة - ${_items[index].createdAt}',
+                subtitleColor: _items[index].quantity > 0 ? null : Colors.red,
+                isActive: _items[index].isActive,
+                onTap: () => Get.to(
+                    () => ShowItem(_items[index].id, _items[index].name)),
+                onEditPressed: () async {
+                  bool? deleted = await Get.to(() => EditItem(_items[index]));
+                  if (deleted != null) {
+                    setState(() {
+                      _items.removeAt(index);
+                    });
+                  }
+                }),
           ),
         ),
       ),

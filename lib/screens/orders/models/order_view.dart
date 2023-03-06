@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../service/current_datetime.dart';
+import '../../../service/notifications.dart';
 
 class OrderView {
   String id;
@@ -56,6 +57,7 @@ class OrderView {
             loadingBill: RxBool(false)),
       );
     }
+    prefs.setString('lastOrderSeen', ordersMap.first['datetime']);
     return orders;
   }
 }
@@ -161,7 +163,7 @@ class OrderStatus {
       case 1:
         return 'تم الإستلام';
       case 2:
-        return 'جار التسليم';
+        return 'جار التوصيل';
       default:
         return 'جار المعالجة';
     }

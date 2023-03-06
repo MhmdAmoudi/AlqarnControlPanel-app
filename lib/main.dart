@@ -6,10 +6,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:manage/widgets/drawer/sections_drawer.dart';
 import 'package:sizer/sizer.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'api/api.dart';
 import 'screens/home/home.dart';
 import 'screens/register/login.dart';
+import 'service/notifications.dart';
 import 'utilities/appearance/theme.dart';
 import 'widgets/global_loader.dart';
 
@@ -93,9 +95,11 @@ class _SplashScreenState extends State<SplashScreen> {
     API.token = await storage.read(key: 'refreshToken');
     await dotenv.load();
     API.baseUrl = dotenv.get('BASE_URL');
+    Workmanager().initialize(callbackDispatcher);
+    Workmanager().registerPeriodicTask('orders', 'new orders count');
     Future.delayed(
       const Duration(seconds: 3),
-      () {
+          () {
         if (API.token != null) {
           MenuDrawer.extractUserInfo();
           Get.off(() => const Home());

@@ -5,6 +5,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:manage/widgets/animated_snackbar.dart';
 
 import '../../../utilities/appearance/style.dart';
+import '../../../widgets/custom_alert_dialog.dart';
 import '../../../widgets/money_text.dart';
 import '../controller/controller.dart';
 import '../models/order_view.dart';
@@ -20,9 +21,9 @@ class OrderCard extends StatefulWidget {
 }
 
 class _OrderCardState extends State<OrderCard> {
-  late final Color statusColor;
-  late final String statusLabel;
-  late final Icon statusIcon;
+  late Color statusColor;
+  late String statusLabel;
+  late Icon statusIcon;
 
   @override
   void initState() {
@@ -76,34 +77,48 @@ class _OrderCardState extends State<OrderCard> {
                     ),
                   ),
                 ),
-                PopupMenuButton(
-                  color: statusColor,
-                  itemBuilder: (BuildContext context) {
-                    return const [
-                      PopupMenuItem(
-                          value: 2, child: Text('تأكيد الشراء وجار التوصيل')),
-                      PopupMenuItem(value: 1, child: Text('تأكيد تسليم الطلب')),
-                      PopupMenuItem(value: 0, child: Text('رفض الطلب')),
-                    ];
-                  },
-                  onSelected: (val) async {
-                    context.loaderOverlay.show();
-                    bool changed = await widget.controller.changeOrderStatus(widget.order.id, val);
-                    context.loaderOverlay.hide();
-                    if (changed) {
-                      setState(() {
-                        changeStatus(val);
-                      });
-                      if (val == 0) {
-                        showSnackBar(
-                            message: 'تم رفض الطلب', type: AlertType.success);
-                      } else {
-                        showSnackBar(
-                            message: 'تم تأكيد الطلب', type: AlertType.success);
+                if (widget.order.status == 3 || widget.order.status == 2)
+                  PopupMenuButton(
+                    icon: Icon(Icons.more_vert_rounded, color: statusColor),
+                    itemBuilder: (BuildContext context) {
+                      return const [
+                        PopupMenuItem(
+                            value: 2, child: Text('تأكيد الشراء وجار التوصيل')),
+                        PopupMenuItem(
+                            value: 1, child: Text('تأكيد تسليم الطلب')),
+                        PopupMenuItem(value: 0, child: Text('رفض الطلب')),
+                      ];
+                    },
+                    onSelected: (val) {
+                      switch (val) {
+                        case 0:
+                          showConfirmChangingStatus(
+                            value: val,
+                            title: 'هل ترغب برفض الطلب؟',
+                            confirmText: 'رفض',
+                            snackBarMessage: 'تم رفض الطلب',
+                          );
+                          break;
+                        case 1:
+                          showConfirmChangingStatus(
+                            value: val,
+                            title: 'هل ترغب بتأكيد تسليم الطلب؟',
+                            confirmText: 'تأكيد',
+                            snackBarMessage: 'تم تأكيد الطلب',
+                          );
+                          break;
+                        case 2:
+                          showConfirmChangingStatus(
+                            value: val,
+                            title: 'هل ترغب بتأكيد الشراء وجار التوصيل؟',
+                            confirmText: 'تأكيد',
+                            snackBarMessage: 'تم تأكيد الطلب',
+                          );
                       }
-                    }
-                  },
-                )
+                    },
+                  )
+                else
+                  const SizedBox(width: 20)
               ],
             ),
           ),
@@ -484,5 +499,33 @@ class _OrderCardState extends State<OrderCard> {
     statusColor = OrderStatus.color(status);
     statusLabel = OrderStatus.label(status);
     statusIcon = OrderStatus.icon(status);
+    widget.order.status = status;
+  }
+
+  void showConfirmChangingStatus({
+    required int value,
+    required String title,
+    required String confirmText,
+    required String snackBarMessage,
+  }) {
+    CustomAlertDialog.show(
+        type: AlertType.question,
+        title: title,
+        showCancelButton: true,
+        confirmBackgroundColor: OrderStatus.color(value),
+        confirmText: confirmText,
+        onConfirmPressed: () async {
+          context.loaderOverlay.show();
+          bool changed =
+              await widget.controller.changeOrderStatus(widget.order.id, value);
+          context.loaderOverlay.hide();
+          if (changed) {
+            setState(() {
+              Get.back();
+              changeStatus(value);
+              showSnackBar(message: snackBarMessage, type: AlertType.success);
+            });
+          }
+        });
   }
 }

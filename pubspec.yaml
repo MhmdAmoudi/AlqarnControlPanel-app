@@ -58,6 +58,9 @@ dependencies:
   auto_size_text: ^3.0.0
   money_formatter: ^0.0.3
   flutter_dotenv: ^5.0.2
+  flutter_local_notifications: ^13.0.0
+  workmanager: ^0.5.1
+  shared_preferences: ^2.0.18
 
 dev_dependencies:
   flutter_test:
