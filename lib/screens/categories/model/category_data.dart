@@ -8,6 +8,7 @@ class CategoryData {
   File? image;
   int itemsCount;
   RxBool isActive;
+  bool hasImage;
 
   CategoryData({
     required this.id,
@@ -15,6 +16,7 @@ class CategoryData {
     this.image,
     required this.itemsCount,
     required this.isActive,
+    required this.hasImage,
   });
 
   static List<CategoryData> fromJson(List<dynamic> data) {
@@ -27,6 +29,7 @@ class CategoryData {
           name: category['name'],
           itemsCount: category['itemsCount'],
           isActive: RxBool(category['isActive']),
+          hasImage: category['hasImage']
         ),
       );
     }

@@ -28,8 +28,7 @@ class CategoryController {
   Future<File> getCategoryImage(String id) async {
     try {
       var data = await _api.get('GetCategoryImage/$id');
-      String tempPath = (await getTemporaryDirectory()).path;
-      return await File('$tempPath/$id').writeAsBytes(
+      return await File('${API.tempPath}/$id').writeAsBytes(
         base64Decode(data),
       );
     } catch (_) {
@@ -37,14 +36,14 @@ class CategoryController {
     }
   }
 
-  Future<String?> addCategory(String name, File image) async {
+  Future<String?> addCategory(String name, File? image) async {
     try {
       FormData form = FormData.fromMap({
         "name": name,
-        "image": await MultipartFile.fromFile(image.path),
+        "image":
+            image != null ? await MultipartFile.fromFile(image.path) : null,
       });
       String id = await _api.postFile('AddCategory', data: form);
-      Get.back();
       Get.back();
       showSnackBar(
         title: 'تم بنجاح',
@@ -70,14 +69,19 @@ class CategoryController {
     }
   }
 
-  Future<bool> updateCategory(
-      CategoryData category, String name, File? image) async {
+  Future<bool> updateCategory({
+    required CategoryData category,
+    required String name,
+    required File? image,
+    required bool imageDeleted,
+  }) async {
     try {
       FormData form = FormData.fromMap({
         'id': category.id,
         "name": name,
         "image":
             image != null ? await MultipartFile.fromFile(image.path) : null,
+        'imageDeleted': imageDeleted
       });
       bool updated = await _api.postFile('UpdateCategory', data: form);
       Get.back();

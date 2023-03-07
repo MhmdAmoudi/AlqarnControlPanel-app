@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../service/current_datetime.dart';
-import '../../../service/notifications.dart';
 
 class OrderView {
   String id;
@@ -37,7 +37,8 @@ class OrderView {
     this.bill,
   });
 
-  static List<OrderView> fromJson(List<dynamic> ordersMap) {
+  static Future<List<OrderView>> fromJson(List<dynamic> ordersMap) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     List<OrderView> orders = [];
     for (var order in ordersMap) {
       orders.add(
@@ -57,7 +58,9 @@ class OrderView {
             loadingBill: RxBool(false)),
       );
     }
-    prefs.setString('lastOrderSeen', ordersMap.first['datetime']);
+    if(ordersMap.isNotEmpty) {
+      prefs.setString('lastOrderSeen', ordersMap.first['datetime']);
+    }
     return orders;
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:manage/widgets/drawer/sections_drawer.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -95,11 +96,12 @@ class _SplashScreenState extends State<SplashScreen> {
     API.token = await storage.read(key: 'refreshToken');
     await dotenv.load();
     API.baseUrl = dotenv.get('BASE_URL');
+    API.tempPath = (await getTemporaryDirectory()).path;
     Workmanager().initialize(callbackDispatcher);
     Workmanager().registerPeriodicTask('orders', 'new orders count');
     Future.delayed(
       const Duration(seconds: 3),
-          () {
+      () {
         if (API.token != null) {
           MenuDrawer.extractUserInfo();
           Get.off(() => const Home());

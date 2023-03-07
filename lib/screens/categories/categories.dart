@@ -52,11 +52,11 @@ class _CategoriesState extends State<Categories> {
             actions: [
               IconButton(
                 onPressed: () {
-                  addCategorySheet(
+                  manageCategorySheet(
                     title: 'إضافة فئة',
                     buttonText: 'إضافة',
-                    onPressed: (name, image) async {
-                      String? id = await controller.addCategory(name, image!);
+                    onPressed: (name, image, _) async {
+                      String? id = await controller.addCategory(name, image);
                       if (id != null) {
                         setState(() {
                           controller.categories.add(
@@ -65,6 +65,7 @@ class _CategoriesState extends State<Categories> {
                               name: name,
                               itemsCount: 0,
                               isActive: RxBool(true),
+                              hasImage: image != null,
                             ),
                           );
                         });
@@ -90,39 +91,48 @@ class _CategoriesState extends State<Categories> {
                   children: List.generate(
                       controller.categories.length,
                       (index) => CardTile(
-                            leading: DownloadImage(
-                              getImage: () {
-                                return controller.getCategoryImage(
-                                    controller.categories[index].id);
-                              },
-                              parent: (image) {
-                                controller.categories[index].image = image;
-                                return CircleAvatar(
-                                  backgroundImage: FileImage(image),
-                                );
-                              },
-                            ),
+                            leading: controller.categories[index].hasImage
+                                ? DownloadImage(
+                                    getImage: () {
+                                      return controller.getCategoryImage(
+                                          controller.categories[index].id);
+                                    },
+                                    parent: (image) {
+                                      controller.categories[index].image =
+                                          image;
+                                      return CircleAvatar(
+                                        backgroundImage: FileImage(image),
+                                      );
+                                    },
+                                  )
+                                : const CircleAvatar(
+                                    backgroundImage:
+                                        AssetImage('asset/icons/alqaren.png'),
+                                  ),
                             title: controller.categories[index].name,
                             subtitle:
                                 '${controller.categories[index].itemsCount} منتج',
                             isActive: controller.categories[index].isActive,
                             onTap: () {},
                             onEditPressed: () async {
-                              addCategorySheet(
+                              manageCategorySheet(
                                 title: 'تعديل فئة',
                                 buttonText: 'تعديل',
                                 cName: controller.categories[index].name,
                                 cImage: controller.categories[index].image,
-                                onPressed: (name, image) async {
-                                  bool updated = await controller.updateCategory(
-                                      controller.categories[index], name, image);
+                                onPressed: (name, image, imageDeleted) async {
+                                  bool updated =
+                                      await controller.updateCategory(
+                                          category:
+                                              controller.categories[index],
+                                          name: name,
+                                          image: image,
+                                          imageDeleted: imageDeleted);
                                   if (updated) {
                                     setState(() {
                                       controller.categories[index].name = name;
-                                      if (image != null) {
-                                        controller.categories[index].image =
-                                            image;
-                                      }
+                                      controller.categories[index].image = image;
+                                      controller.categories[index].hasImage = image != null;
                                     });
                                   }
                                 },
@@ -161,16 +171,17 @@ class _CategoriesState extends State<Categories> {
     );
   }
 
-  void addCategorySheet({
+  void manageCategorySheet({
     required String title,
     required String buttonText,
-    required Future Function(String name, File? image) onPressed,
+    required Future Function(String, File?, bool imageDeleted) onPressed,
     String? cName,
     File? cImage,
   }) {
     final TextEditingController name = TextEditingController();
     Rx<File?> image = Rx<File?>(cImage);
-    bool isImageEdited = false;
+    bool isImageEdited = cName == null;
+    bool imageDeleted = false;
     name.text = cName ?? '';
 
     showGetBottomSheet(
@@ -194,9 +205,24 @@ class _CategoriesState extends State<Categories> {
                       size: 30,
                     ),
                   )
-                : CircleAvatar(
-                    radius: 40,
-                    backgroundImage: FileImage(image.value!),
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: FileImage(image.value!),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          imageDeleted = true;
+                          image.value = null;
+                        },
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.red,
+                        ),
+                      )
+                    ],
                   ),
           ),
         ),
@@ -229,26 +255,21 @@ class _CategoriesState extends State<Categories> {
               : ElevatedButton(
                   onPressed: () async {
                     if (nameKey.currentState!.validate()) {
-                      if (image.value != null) {
-                        CustomAlertDialog.show(
-                          type: AlertType.question,
-                          title:
-                              'هل ترغب حقاً ب$buttonText الفئة ${name.text.trim()}؟',
-                          onConfirmPressed: () async {
-                            loading(true);
-                            await onPressed(
-                              name.text.trim(),
-                              isImageEdited ? image.value : null,
-                            );
-                            loading(false);
-                          },
-                        );
-                      } else {
-                        showSnackBar(
-                          message: 'يرجى اختيار صورة الفئة',
-                          type: AlertType.warning,
-                        );
-                      }
+                      CustomAlertDialog.show(
+                        type: AlertType.question,
+                        title:
+                            'هل ترغب حقاً ب$buttonText الفئة ${name.text.trim()}؟',
+                        onConfirmPressed: () async {
+                          loading(true);
+                          Get.back();
+                          await onPressed(
+                            name.text.trim(),
+                            isImageEdited ? image.value : null,
+                            imageDeleted,
+                          );
+                          loading(false);
+                        },
+                      );
                     }
                   },
                   child: Text(buttonText),

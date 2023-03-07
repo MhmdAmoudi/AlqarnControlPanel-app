@@ -9,7 +9,7 @@ class OrderController {
 
   Future<List<OrderView>> getOrders(List<String> sentItemsIds) async {
     var data = await _api.post('GetOrders', data: sentItemsIds);
-    return OrderView.fromJson(data);
+    return await OrderView.fromJson(data);
   }
 
   Future<OrderBillItem?> getOrderBill(String id) async {

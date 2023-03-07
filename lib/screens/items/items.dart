@@ -53,7 +53,7 @@ class _ItemsState extends State<Items> {
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             margin: const EdgeInsets.only(top: 1),
             items: _items,
-            getItems: (List<String> sentItemsIds) => getItems(sentItemsIds),
+            getItems: getItems,
             child: (int index) => CardTile(
                 leading: _items[index].haveImage
                     ? DownloadImage(

@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../api/api.dart';
 import '../../screens/bottles/bottles.dart';
+import '../../screens/charge_cards/charge_cards.dart';
 import '../../screens/items/items.dart';
 import '../../screens/locations/locations.dart';
 import '../../screens/notifications/notifications.dart';
@@ -129,6 +130,14 @@ class MenuDrawer extends StatelessWidget {
                   ),
                   DrawerTile(
                     index: 7,
+                    title: 'كروت الشحن',
+                    selectedIcon: Icons.qr_code_2_rounded,
+                    unselectedIcon: Icons.qr_code_2_outlined,
+                    onTap: () => Get.off(() => ChargeCards(),
+                        transition: Transition.leftToRight),
+                  ),
+                  DrawerTile(
+                    index: 8,
                     title: 'الإعلانات',
                     selectedIcon: Icons.notifications_on_rounded,
                     unselectedIcon: Icons.notifications_on_outlined,
@@ -136,7 +145,7 @@ class MenuDrawer extends StatelessWidget {
                         transition: Transition.leftToRight),
                   ),
                   DrawerTile(
-                    index: 8,
+                    index: 9,
                     title: 'العملات',
                     selectedIcon: Icons.monetization_on_rounded,
                     unselectedIcon: Icons.monetization_on_outlined,
@@ -146,7 +155,7 @@ class MenuDrawer extends StatelessWidget {
                     ),
                   ),
                   DrawerTile(
-                    index: 9,
+                    index: 10,
                     title: 'الطلبات',
                     selectedIcon: Icons.list_rounded,
                     unselectedIcon: Icons.list_outlined,

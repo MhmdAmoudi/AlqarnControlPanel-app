@@ -1,11 +1,12 @@
+import 'dart:math';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
-
-import '../api/api.dart';
 
 late FlutterLocalNotificationsPlugin _localNotificationService;
 late SharedPreferences prefs;
@@ -18,9 +19,19 @@ void callbackDispatcher() async {
 }
 
 Future<int> _getNewOrders() async {
-  await dotenv.load();
-  API.baseUrl = dotenv.get('BASE_URL');
-  final API api = API('Notification');
+  if (!dotenv.isInitialized) await dotenv.load();
+  Dio dio = Dio(
+    BaseOptions(
+      baseUrl: '${dotenv.get('BASE_URL')}Notification/',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      connectTimeout: 15000,
+      sendTimeout: 30000,
+      receiveTimeout: 30000,
+    ),
+  );
   prefs = await SharedPreferences.getInstance();
   String? lastOrderSeen = prefs.getString('lastOrderSeen');
   DateTime? lastOrderDatetime;
@@ -28,7 +39,11 @@ Future<int> _getNewOrders() async {
     lastOrderDatetime = DateTime.parse(lastOrderSeen);
   }
   try {
-    int count = await api.get('GetNewOrdersCount/$lastOrderDatetime');
+    Response response = await dio.get('GetNewOrdersCount/$lastOrderDatetime');
+    int count = 0;
+    if (response.statusCode == 200) {
+      count = response.data['data'];
+    }
     return count;
   } catch (_) {
     return 0;

@@ -10,6 +10,8 @@ class API {
   late final Dio _dio;
   late final Dio _dioFile;
 
+  static late final tempPath;
+
   static String? token;
 
   static late String baseUrl;
