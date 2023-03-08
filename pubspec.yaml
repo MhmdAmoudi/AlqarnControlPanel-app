@@ -62,6 +62,9 @@ dependencies:
   workmanager: ^0.5.1
   shared_preferences: ^2.0.18
   pretty_qr_code: ^2.0.3
+  image: ^4.0.15
+  share_plus: ^6.3.1
+  widgets_to_image: ^0.0.2
 
 dev_dependencies:
   flutter_test:

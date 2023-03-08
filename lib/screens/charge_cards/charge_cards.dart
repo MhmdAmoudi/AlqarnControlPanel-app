@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+
 import 'package:manage/screens/charge_cards/controllers/charge_card_controller.dart';
 import 'package:manage/utilities/appearance/style.dart';
 import 'package:manage/widgets/animated_snackbar.dart';
 import 'package:manage/widgets/custom_textfield.dart';
-import 'package:numberpicker/numberpicker.dart';
-
 import '../../widgets/bottom_sheet.dart';
 import '../../widgets/card_tile.dart';
 import '../../widgets/drawer/sections_drawer.dart';
@@ -17,6 +16,7 @@ import '../../widgets/infinite_list.dart';
 import '../home/home.dart';
 import 'models/charge_card.dart';
 import 'widgets/add_charge_cards.dart';
+import 'widgets/qr_data_card.dart';
 
 class ChargeCards extends StatelessWidget {
   ChargeCards({Key? key}) : super(key: key);
@@ -76,9 +76,11 @@ class ChargeCards extends StatelessWidget {
                       balance: '${controller.items[index].balance}',
                     );
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.qr_code_2_rounded,
-                    color: AppColors.mainColor,
+                    color: controller.items[index].used!
+                        ? Colors.red
+                        : AppColors.mainColor,
                     size: 40,
                   )),
               title: controller.items[index].card,
@@ -102,26 +104,27 @@ class ChargeCards extends StatelessWidget {
     required List allCodes,
   }) {
     RxInt count = RxInt(1);
-    RxInt length = RxInt(2);
-    Rx<DateTime> expireAt = Rx(DateTime.now().add(const Duration(days: 1)));
+    RxInt length = RxInt(16);
+    Rx<DateTime> expireAt = Rx(DateTime.now().add(const Duration(days: 30)));
     RxBool numbers = RxBool(false);
     TextEditingController balance = TextEditingController();
     List<String> codes = [];
     showGetBottomSheet(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       title: 'إضافة كروت شحن',
       children: [
-        cardData(
+        QrDataCard(
           label: 'عدد الكروت',
           value: count,
           minValue: 1,
           maxValue: 1000,
         ),
         const Divider(),
-        cardData(
+        QrDataCard(
           label: 'عدد أحرف الكرت',
           value: length,
-          minValue: 2,
-          maxValue: 8,
+          minValue: 12,
+          maxValue: 30,
         ),
         const Divider(),
         Row(
@@ -171,6 +174,7 @@ class ChargeCards extends StatelessWidget {
         const Divider(),
         Obx(
           () => SwitchListTile(
+            contentPadding: EdgeInsets.zero,
             value: numbers.value,
             title: const Text('يتضمن أرقام'),
             onChanged: numbers,
@@ -214,7 +218,7 @@ class ChargeCards extends StatelessWidget {
                       codes: codes,
                       balance: balance.text,
                       expireAt: expireAt.value,
-                  currency: currency,
+                      currency: currency,
                     ));
               }
             } else {
@@ -224,35 +228,6 @@ class ChargeCards extends StatelessWidget {
           },
           child: const Text('إنشاء'),
         )
-      ],
-    );
-  }
-
-  Widget cardData({
-    required String label,
-    required RxInt value,
-    required int minValue,
-    required int maxValue,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label),
-        Card(
-          color: AppColors.darkSubColor,
-          child: Obx(() => NumberPicker(
-                value: value.value,
-                minValue: minValue,
-                maxValue: maxValue,
-                onChanged: value,
-                itemHeight: 20,
-                textStyle: const TextStyle(color: Colors.grey, fontSize: 10),
-                selectedTextStyle: const TextStyle(
-                  color: AppColors.mainColor,
-                  fontSize: 18,
-                ),
-              )),
-        ),
       ],
     );
   }

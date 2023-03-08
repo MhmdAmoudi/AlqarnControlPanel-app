@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:manage/screens/charge_cards/controllers/charge_card_controller.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:sizer/sizer.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 
 class QrCodeImage extends StatelessWidget {
   final String code;
@@ -9,16 +11,19 @@ class QrCodeImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: PrettyQr(
-          image: const AssetImage('asset/images/main_logo.png'),
-          typeNumber: 1,
-          size: 60.w,
-          data: code,
-          roundEdges: true,
+    return WidgetsToImage(
+      controller: ChargeCardController.controller,
+      child: Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: PrettyQr(
+            size: 60.w,
+            roundEdges: true,
+            typeNumber: 3,
+            data: code,
+            image: const AssetImage('asset/images/qr_logo.png'),
+          ),
         ),
       ),
     );

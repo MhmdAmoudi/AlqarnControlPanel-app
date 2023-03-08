@@ -3,16 +3,22 @@ import 'dart:io';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:manage/screens/charge_cards/widgets/qr_code_image.dart';
-import 'package:manage/utilities/appearance/style.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:manage/screens/charge_cards/widgets/qr_code_image.dart';
+import 'package:manage/utilities/appearance/style.dart';
+import 'package:manage/widgets/animated_snackbar.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 import '../../../api/api.dart';
 import '../models/charge_card.dart';
 
 class ChargeCardController extends GetxController {
   final API _api = API('ChargeCards');
   late List<ChargeCardData> items;
+
+  static WidgetsToImageController controller = WidgetsToImageController();
 
   Future<List<ChargeCardData>> getChargeCards(List<String> sentIds) async {
     try {
@@ -43,7 +49,7 @@ class ChargeCardController extends GetxController {
         data: {
           'codes': codes,
           'balance': balance,
-          'ExpireAfterDays': expireAt.difference(DateTime.now()).inDays,
+          'expireAt': expireAt.toUtc().toString().replaceFirst('Z', ''),
         },
       );
       return true;
@@ -81,7 +87,17 @@ class ChargeCardController extends GetxController {
                       child: Text('$balance $currency'),
                     ),
                   ),
-                  IconButton(onPressed: (){}, icon: const Icon(Icons.share_rounded))
+                  IconButton(
+                    onPressed: () async {
+                      context.loaderOverlay.show();
+                      String? path = await shareQrCode(code);
+                      context.loaderOverlay.hide();
+                      if(path != null){
+                        await Share.shareXFiles([XFile(path)], subject: 'رمز متجر القرن');
+                      }
+                    },
+                    icon: const Icon(Icons.share_rounded),
+                  )
                 ],
               )
             ],
@@ -91,15 +107,28 @@ class ChargeCardController extends GetxController {
     );
   }
 
-  void shareQrCode() async {
-    Directory tempDir = await getTemporaryDirectory();
-    String tempPath = tempDir.path;
-    final ts = DateTime.now().millisecondsSinceEpoch.toString();
-    String path = '$tempPath/$ts.png';
-
-    // final picData =
-    //     await painter.toImageData(2048, format: ui.ImageByteFormat.png);
-    // await writeToFile(picData, path);
+  Future<String?> shareQrCode(String code) async {
+    final bytes = await controller.capture();
+    if (bytes != null) {
+      try {
+        Directory tempDir = await getTemporaryDirectory();
+        String tempPath = tempDir.path;
+        final ts = DateTime.now().millisecondsSinceEpoch.toString();
+        String path = '$tempPath/$ts.png';
+        return (await File(path).writeAsBytes(bytes)).path;
+      } catch (_) {
+        showSnackBar(
+          message: 'فشل في حفظ صورة الرمز',
+          type: AlertType.failure,
+        );
+      }
+    } else {
+      showSnackBar(
+        message: 'فشل إنشاء صورة الرمز',
+        type: AlertType.failure,
+      );
+    }
+    return null;
   }
 
   @override

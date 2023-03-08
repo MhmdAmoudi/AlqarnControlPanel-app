@@ -10,6 +10,7 @@ class ChargeCardData {
   String currency;
   String expireAt;
   RxBool? isActive;
+  bool? used;
 
   ChargeCardData({
     this.id,
@@ -19,6 +20,7 @@ class ChargeCardData {
     required this.currency,
     required this.expireAt,
     this.isActive,
+    this.used,
   });
 
   static List<ChargeCardData> fromJson(List cardsMap) {
@@ -30,6 +32,7 @@ class ChargeCardData {
               currency: e['currency'],
               expireAt: getZoneDatetime(e['expiryAt'])!,
               isActive: RxBool(e['isActive']),
+              used: false,
             ))
         .toList();
   }
