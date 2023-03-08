@@ -9,6 +9,7 @@ import 'package:manage/screens/charge_cards/controllers/charge_card_controller.d
 import 'package:manage/utilities/appearance/style.dart';
 import 'package:manage/widgets/animated_snackbar.dart';
 import 'package:manage/widgets/custom_textfield.dart';
+import 'package:widgets_to_image/widgets_to_image.dart';
 import '../../widgets/bottom_sheet.dart';
 import '../../widgets/card_tile.dart';
 import '../../widgets/drawer/sections_drawer.dart';
@@ -74,6 +75,7 @@ class ChargeCards extends StatelessWidget {
                       code: controller.items[index].card,
                       currency: controller.items[index].currency,
                       balance: '${controller.items[index].balance}',
+                      expireAt: controller.items[index].expireAt,
                     );
                   },
                   icon: Icon(
@@ -213,6 +215,10 @@ class ChargeCards extends StatelessWidget {
                     message: 'يبدو أن كل الإحتمالات موجوده سابقاً',
                     type: AlertType.failure);
               } else {
+                controller.qrCodeControllers = List.generate(
+                  codes.length,
+                  (index) => WidgetsToImageController(),
+                );
                 Get.off(() => AddChargeCards(
                       controller: controller,
                       codes: codes,

@@ -32,7 +32,7 @@ class ChargeCardData {
               currency: e['currency'],
               expireAt: getZoneDatetime(e['expiryAt'])!,
               isActive: RxBool(e['isActive']),
-              used: false,
+              used: e['used'],
             ))
         .toList();
   }

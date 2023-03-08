@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:manage/screens/charge_cards/controllers/charge_card_controller.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:sizer/sizer.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 
-class QrCodeImage extends StatelessWidget {
-  final String code;
+import 'qr_image_design.dart';
+import 'qr_image_tail.dart';
 
-  const QrCodeImage(this.code, {Key? key}) : super(key: key);
+class QrCodeImage extends StatelessWidget {
+  final WidgetsToImageController qrCodeController;
+  final String code;
+  final String balance;
+  final String expireAt;
+
+  const QrCodeImage({
+    Key? key,
+    required this.qrCodeController,
+    required this.code,
+    required this.balance,
+    required this.expireAt,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return WidgetsToImage(
-      controller: ChargeCardController.controller,
-      child: Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: PrettyQr(
+      controller: qrCodeController,
+      child: Column(
+        children: [
+          QrImageDesign(
+            code: code,
             size: 60.w,
-            roundEdges: true,
-            typeNumber: 3,
-            data: code,
-            image: const AssetImage('asset/images/qr_logo.png'),
           ),
-        ),
+          QrImageTail(
+            size: 60.w + 20,
+            balance: balance,
+            expireAt: expireAt,
+          )
+        ],
       ),
     );
   }

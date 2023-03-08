@@ -60,14 +60,13 @@ abstract class CustomAlertDialog {
                 left: 15,
                 right: 15,
                 top: 20,
-                bottom: 10,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   const SizedBox(height: 10),
                   if (content != null)

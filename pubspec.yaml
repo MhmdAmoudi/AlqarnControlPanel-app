@@ -65,6 +65,7 @@ dependencies:
   image: ^4.0.15
   share_plus: ^6.3.1
   widgets_to_image: ^0.0.2
+  pdf: ^3.9.0
 
 dev_dependencies:
   flutter_test:

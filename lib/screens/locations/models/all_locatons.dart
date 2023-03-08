@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 
 class AllLocations {
+  IconData icon;
   String name;
   Widget page;
-  String trailing;
 
-  AllLocations({required this.name, required this.page, required this.trailing});
+  AllLocations({required this.name,required this.icon, required this.page});
 }
