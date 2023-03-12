@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:manage/api/response_error.dart';
 
 import 'package:manage/screens/charge_cards/controllers/charge_card_controller.dart';
 import 'package:manage/utilities/appearance/style.dart';
@@ -19,8 +20,14 @@ import 'models/charge_card.dart';
 import 'widgets/add_charge_cards.dart';
 import 'widgets/qr_data_card.dart';
 
-class ChargeCards extends StatelessWidget {
+class ChargeCards extends StatefulWidget {
   ChargeCards({Key? key}) : super(key: key);
+
+  @override
+  State<ChargeCards> createState() => _ChargeCardsState();
+}
+
+class _ChargeCardsState extends State<ChargeCards> {
   final ChargeCardController controller = Get.put(ChargeCardController());
 
   @override
@@ -91,8 +98,29 @@ class ChargeCards extends StatelessWidget {
               isActive: controller.items[index].isActive!,
               onTap: () {},
               onEditPressed: () {},
-              onActivePressed: (val) {},
-              onDeletePressed: () {},
+              onActivePressed: (val) async {
+                try {
+                  controller.items[index].isActive!.value = await controller
+                      .changeState(id: controller.items[index].id!, state: val);
+                  showSnackBar(
+                      message: 'تم تعديل حالة الكرت', type: AlertType.success);
+                } on ResponseError catch (e) {
+                  showSnackBar(message: e.message, type: AlertType.failure);
+                }
+              },
+              onDeletePressed: () async {
+                try {
+                  await controller.deleteCode(controller.items[index].id!);
+                  showSnackBar(
+                      message: 'تم حذف ${controller.items[index].card} بنجاح',
+                      type: AlertType.success);
+                  setState(() {
+                    controller.items.removeAt(index);
+                  });
+                } on ResponseError catch (e) {
+                  showSnackBar(message: e.message, type: AlertType.failure);
+                }
+              },
             ),
           ),
         ),

@@ -66,6 +66,14 @@ class ChargeCardController extends GetxController {
     }
   }
 
+  Future<void> deleteCode(String id) async {
+    await _api.delete('DeleteCard/$id');
+  }
+
+  Future<bool> changeState({required String id, required bool state}) async {
+    return await _api.post('ChangeCardState', data: {id: state});
+  }
+
   String getDate(DateTime datetime) =>
       formatDate(datetime, [yyyy, '/', mm, '/', dd]);
 
@@ -120,11 +128,7 @@ class ChargeCardController extends GetxController {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => generateQrPdf(
-                      context: context,
-                      balance: balance,
-                      expireAt: expireAt,
-                    ),
+                    onPressed: () => generateQrPdf(context),
                     icon: const Icon(
                       Icons.picture_as_pdf_rounded,
                       color: Colors.deepOrange,
@@ -146,103 +150,167 @@ class ChargeCardController extends GetxController {
       String path = '${tempDir.path}/$ts.png';
       return (await File(path).writeAsBytes(bytes)).path;
     } catch (_) {
-      showSnackBar(
-        message: 'فشل في حفظ صورة الرمز',
-        type: AlertType.failure,
-      );
+      return null;
     }
-
-    return null;
   }
 
-  Future<void> generateQrPdf({
-    required BuildContext context,
-    required String balance,
-    required String expireAt,
+  Future<void> generateQrPdf(
+    BuildContext context, {
+    String? balance,
+    String? expireAt,
     List<GlobalKey>? codesKey,
   }) async {
     context.loaderOverlay.show();
     try {
-      List<String> images = [];
-      String? path;
-      Uint8List? byte;
-      if (codesKey == null) {
-        byte = await qrCodeController.capture();
-        if (byte != null) {
-          path = await _createQrImage(byte);
-          if (path != null) {
-            images.add(path);
-          }
-        }
-      } else {
-        for (int i = 0; i < qrCodeControllers.length; i++) {
-          await Scrollable.ensureVisible(codesKey[i].currentContext!);
-          byte = await qrCodeControllers[i].capture();
-          if (byte == null) break;
-          path = await _createQrImage(byte);
-          if (path == null) break;
-          images.add(path);
-        }
-      }
-
-      if (byte != null || path == null) {
-        final bytes = await rootBundle.load('asset/images/main_logo.png');
-        final logo = pw.MemoryImage(bytes.buffer.asUint8List());
-        final pdf = pw.Document(
-          title: 'رموز تعبئة الرصيد',
-          author: 'متجر القرن',
-          creator: 'تطبيق أدارة المتجر',
-        );
-        pdf.addPage(pw.MultiPage(
-          header: (_) {
-            return pw.Container(
-              margin: const pw.EdgeInsets.only(bottom: 20),
-              padding: const pw.EdgeInsets.only(bottom: 10),
-              decoration: const pw.BoxDecoration(
-                border: pw.Border(bottom: pw.BorderSide(color: PdfColors.black))
-              ),
-              child: pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.center,
-                  children: [
-                    pw.Image(logo, height: 50)
-                  ]
-              )
-            );
-          },
-          build: (pw.Context context) {
-            return [
-              pw.GridView(
-                crossAxisCount: 4,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5,
-                childAspectRatio: 1 / 1,
-                children: List.generate(
-                  images.length,
-                  (index) => pw.Image(
-                    pw.MemoryImage(
-                      File(images[index]).readAsBytesSync(),
-                    ),
-                    height: 100,
-                    width: 100,
-                  ),
-                ),
-              )
-            ];
-          },
-        ));
-
-        Directory tempDir = await getTemporaryDirectory();
-        String pdfPath = "${tempDir.path}/example.pdf";
-        final file = File(pdfPath);
-        await file.writeAsBytes(await pdf.save());
-        context.loaderOverlay.hide();
-        Get.back();
-        await Share.shareXFiles([XFile(pdfPath)]);
-      }
+      List<String> images = await _getQrImagesPaths(codesKey);
+      pw.Document pdf = await _createPdf(
+        images: images,
+        balance: balance,
+        expireAt: expireAt,
+      );
+      XFile qrPdf = await _savePdf(pdf);
+      context.loaderOverlay.hide();
+      Get.back();
+      await Share.shareXFiles([qrPdf]);
     } catch (_) {
       context.loaderOverlay.hide();
       showSnackBar(message: 'حصل خطأ في تحويل الرموز', type: AlertType.failure);
     }
+  }
+
+  Future<List<String>> _getQrImagesPaths(List<GlobalKey>? codesKey) async {
+    List<String> images = [];
+    String? path;
+    Uint8List? byte;
+
+    if (codesKey == null) {
+      byte = await qrCodeController.capture();
+      path = await _createQrImage(byte!);
+      images.add(path!);
+    } else {
+      for (int i = 0; i < qrCodeControllers.length; i++) {
+        await Scrollable.ensureVisible(codesKey[i].currentContext!);
+        byte = await qrCodeControllers[i].capture();
+        path = await _createQrImage(byte!);
+        images.add(path!);
+      }
+    }
+    return images;
+  }
+
+  Future<pw.Document> _createPdf({
+    required List<String> images,
+    String? balance,
+    String? expireAt,
+  }) async {
+    final bytes = await rootBundle.load('asset/images/main_logo.png');
+    final logo = pw.MemoryImage(bytes.buffer.asUint8List());
+    final font = await rootBundle.load("asset/fonts/agnadeen.ttf");
+    final ttf = pw.Font.ttf(font);
+
+    final pdf = pw.Document(
+      title: 'رموز تعبئة الرصيد',
+      author: 'متجر القرن',
+      creator: 'تطبيق أدارة المتجر',
+    );
+
+    pdf.addPage(pw.MultiPage(
+      header: (_) {
+        return pw.Container(
+            margin: const pw.EdgeInsets.only(bottom: 20),
+            padding: const pw.EdgeInsets.only(bottom: 10),
+            decoration: const pw.BoxDecoration(
+                border:
+                    pw.Border(bottom: pw.BorderSide(color: PdfColors.black))),
+            child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                children: [pw.Image(logo, height: 50)]));
+      },
+      build: (pw.Context context) {
+        return [
+          if (balance != null)
+            pw.GridView(
+              crossAxisCount: 5,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+              childAspectRatio: 1.16 / 1,
+              children: List.generate(
+                images.length,
+                (index) => pw.Column(
+                  mainAxisSize: pw.MainAxisSize.min,
+                  children: [
+                    pw.Expanded(
+                      child: pw.Image(
+                        pw.MemoryImage(
+                          File(images[index]).readAsBytesSync(),
+                        ),
+                      ),
+                    ),
+                    pw.SizedBox(
+                      height: 15,
+                      width: 85,
+                      child: pw.Row(
+                        children: [
+                          qrImageInfo(expireAt!, ttf),
+                          pw.SizedBox(width: 2),
+                          qrImageInfo(balance, ttf),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          else
+            pw.GridView(
+              crossAxisCount: 5,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+              childAspectRatio: 1 / 1,
+              children: List.generate(
+                images.length,
+                (index) => pw.Image(
+                  pw.MemoryImage(
+                    File(images[index]).readAsBytesSync(),
+                  ),
+                ),
+              ),
+            )
+        ];
+      },
+    ));
+
+    return pdf;
+  }
+
+  Future<XFile> _savePdf(pw.Document pdf) async {
+    Directory tempDir = await getTemporaryDirectory();
+    String pdfPath = "${tempDir.path}/example.pdf";
+    final file = File(pdfPath);
+    await file.writeAsBytes(await pdf.save());
+    return XFile(pdfPath);
+  }
+
+  pw.Expanded qrImageInfo(String label, pw.Font ttf) {
+    return pw.Expanded(
+      child: pw.Container(
+        padding: const pw.EdgeInsets.all(1),
+        decoration: pw.BoxDecoration(
+            color: PdfColors.white,
+            borderRadius: pw.BorderRadius.circular(3),
+            border: pw.Border.all(color: PdfColors.grey400, width: 0.3)),
+        child: pw.Center(
+          child: pw.Text(
+            label,
+            style: pw.TextStyle(
+              fontWeight: pw.FontWeight.bold,
+              font: ttf,
+              fontSize: 6,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override

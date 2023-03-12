@@ -91,10 +91,10 @@ class AddChargeCards extends StatelessWidget {
                             });
                         if (saved) {
                           await controller.generateQrPdf(
-                            context: context,
+                            context,
                             codesKey: qrImageKeys,
                             balance: balance,
-                            expireAt: getZoneDatetime('$expireAt')!,
+                            expireAt: getZoneDatetime('$expireAt'),
                           );
                         }
                         Get.back(result: true);
@@ -105,6 +105,19 @@ class AddChargeCards extends StatelessWidget {
                       }
                     },
                     child: const Text('حفظ'),
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await controller.generateQrPdf(
+                        context,
+                        codesKey: qrImageKeys,
+                        balance: '$balance $currency',
+                        expireAt: getZoneDatetime('$expireAt'),
+                      );
+                    },
+                    child: const Text('gen'),
                   ),
                 ),
               ],

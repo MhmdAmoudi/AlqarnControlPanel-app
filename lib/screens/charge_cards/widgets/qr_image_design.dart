@@ -16,7 +16,7 @@ class QrImageDesign extends StatelessWidget {
     return Card(
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: EdgeInsets.all(size * 0.05),
         child: PrettyQr(
           size: size,
           roundEdges: true,

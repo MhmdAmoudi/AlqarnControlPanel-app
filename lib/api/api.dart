@@ -181,13 +181,12 @@ class API {
     );
   }
 
-// Future<dynamic> delete(
-//   String path, {
-//   dynamic data,
-// }) async {
-//   print(path);
-//   return await _apiRequest(
-//     () => _dio.delete(path, data: json.encode(data)),
-//   );
-// }
+  Future<dynamic> delete(
+    String path, {
+    dynamic data,
+  }) async {
+    return await _apiRequest(
+      () => _dio.delete(path, data: json.encode(data)),
+    );
+  }
 }

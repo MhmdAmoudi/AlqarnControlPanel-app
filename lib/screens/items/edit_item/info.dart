@@ -90,6 +90,7 @@ class _EditInfoState extends State<EditInfo> {
   }
 
   Future<void> update() async {
+
     if (name.text.trim().isNotEmpty) {
       context.loaderOverlay.show();
       try {
@@ -98,7 +99,7 @@ class _EditInfoState extends State<EditInfo> {
           data: {
             'id': widget.id,
             'name': name.text.trim(),
-            if (description.text.trim().isNotEmpty) 'description': description,
+            if (description.text.trim().isNotEmpty) 'description': description.text,
           },
         );
         context.loaderOverlay.hide();
@@ -109,7 +110,7 @@ class _EditInfoState extends State<EditInfo> {
         showSnackBar(
           title: 'فشل التعديل',
           message: e.message,
-          type: AlertType.success,
+          type: AlertType.failure,
         );
       }
     } else {
