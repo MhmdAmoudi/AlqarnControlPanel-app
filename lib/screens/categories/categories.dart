@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
+import '../../service/go_main_screen.dart';
+import '../../widgets/add_image_to_category.dart';
 import '../../widgets/animated_snackbar.dart';
 import '../../widgets/bottom_sheet.dart';
 import '../../widgets/card_tile.dart';
 import '../../widgets/custom_alert_dialog.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../widgets/download_image.dart';
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 import '../../widgets/error_handler.dart';
 import '../home/home.dart';
 import 'controller/category_controller.dart';
@@ -42,10 +43,7 @@ class _CategoriesState extends State<Categories> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('الفئات'),
@@ -187,44 +185,10 @@ class _CategoriesState extends State<Categories> {
     showGetBottomSheet(
       title: title,
       children: [
-        GestureDetector(
-          onTap: () async {
-            XFile? file =
-                await ImagePicker().pickImage(source: ImageSource.gallery);
-            if (file != null) {
-              image(File(file.path));
-              isImageEdited = true;
-            }
-          },
-          child: Obx(
-            () => image.value == null
-                ? const CircleAvatar(
-                    radius: 40,
-                    child: Icon(
-                      Icons.add_rounded,
-                      size: 30,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: FileImage(image.value!),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          imageDeleted = true;
-                          image.value = null;
-                        },
-                        icon: const Icon(
-                          Icons.delete_outline_rounded,
-                          color: Colors.red,
-                        ),
-                      )
-                    ],
-                  ),
-          ),
+        AddImageToCategory(
+          image: image,
+          isImageEdited: isImageEdited,
+          imageDeleted: imageDeleted,
         ),
         Padding(
           padding: const EdgeInsets.all(20),

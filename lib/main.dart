@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:manage/widgets/drawer/sections_drawer.dart';
+import 'package:manage/widgets/drawer/menu_drawer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:workmanager/workmanager.dart';
@@ -72,6 +72,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    precacheImage(const AssetImage("asset/images/main_logo.png"), context);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
@@ -81,8 +87,8 @@ class _SplashScreenState extends State<SplashScreen> {
           child: AnimatedOpacity(
             opacity: startLogo ? 1 : 0,
             duration: const Duration(seconds: 2),
-            child: Image.asset(
-              'asset/images/main_logo.png',
+            child: Image(
+              image: const AssetImage('asset/images/main_logo.png'),
               height: 20.h,
             ),
           ),
@@ -97,18 +103,23 @@ class _SplashScreenState extends State<SplashScreen> {
     await dotenv.load();
     API.baseUrl = dotenv.get('BASE_URL');
     API.tempPath = (await getTemporaryDirectory()).path;
-    Workmanager().initialize(callbackDispatcher);
-    Workmanager().registerPeriodicTask('orders', 'new orders count');
-    Future.delayed(
-      const Duration(seconds: 3),
-      () {
-        if (API.token != null) {
-          MenuDrawer.extractUserInfo();
+    if (API.token != null) {
+      Workmanager().initialize(callbackDispatcher);
+      Workmanager().registerPeriodicTask('orders', 'new orders count');
+      MenuDrawer.extractUserInfo();
+      Future.delayed(
+        const Duration(seconds: 3),
+        () {
           Get.off(() => const Home());
-        } else {
+        },
+      );
+    } else {
+      Future.delayed(
+        const Duration(seconds: 3),
+        () {
           Get.off(() => const Login());
-        }
-      },
-    );
+        },
+      );
+    }
   }
 }

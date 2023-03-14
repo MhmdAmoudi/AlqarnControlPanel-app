@@ -68,7 +68,7 @@ class MenuDrawer extends StatelessWidget {
               flex: 3,
               child: ListView(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 children: [
                   DrawerTile(
                     index: 0,
@@ -133,7 +133,7 @@ class MenuDrawer extends StatelessWidget {
                     title: 'كروت الشحن',
                     selectedIcon: Icons.qr_code_2_rounded,
                     unselectedIcon: Icons.qr_code_2_outlined,
-                    onTap: () => Get.off(() => ChargeCards(),
+                    onTap: () => Get.off(() => const ChargeCards(),
                         transition: Transition.leftToRight),
                   ),
                   DrawerTile(

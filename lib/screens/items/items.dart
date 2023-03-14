@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../api/api.dart';
+import '../../service/go_main_screen.dart';
 import '../../widgets/card_tile.dart';
 import '../../widgets/download_image.dart';
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 import '../../widgets/infinite_list.dart';
 import '../home/home.dart';
 import 'controller/item_controller.dart';
@@ -30,10 +31,7 @@ class _ItemsState extends State<Items> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('المنتجات'),

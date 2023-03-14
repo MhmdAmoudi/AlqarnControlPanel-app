@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class Home extends StatelessWidget {
             Fluttertoast.showToast(msg: 'اضغط مره أخرى للخروج');
             _exit = true;
             Future.delayed(
-              const Duration(seconds: 3),
+              const Duration(seconds: 2),
               () {
                 _exit = false;
               },

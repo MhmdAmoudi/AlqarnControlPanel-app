@@ -8,7 +8,7 @@ import '../../../api/api.dart';
 import '../../../api/response_error.dart';
 import '../../../utilities/appearance/style.dart';
 import '../../../widgets/custom_alert_dialog.dart';
-import '../../../widgets/drawer/sections_drawer.dart';
+import '../../../widgets/drawer/menu_drawer.dart';
 import '../../home/home.dart';
 
 class LoginController {

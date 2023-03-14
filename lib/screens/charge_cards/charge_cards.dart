@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:manage/api/response_error.dart';
 
 import 'package:manage/screens/charge_cards/controllers/charge_card_controller.dart';
 import 'package:manage/utilities/appearance/style.dart';
 import 'package:manage/widgets/animated_snackbar.dart';
 import 'package:manage/widgets/custom_textfield.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
+import '../../service/go_main_screen.dart';
 import '../../widgets/bottom_sheet.dart';
 import '../../widgets/card_tile.dart';
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 import '../../widgets/infinite_list.dart';
 import '../home/home.dart';
 import 'models/charge_card.dart';
@@ -21,7 +21,7 @@ import 'widgets/add_charge_cards.dart';
 import 'widgets/qr_data_card.dart';
 
 class ChargeCards extends StatefulWidget {
-  ChargeCards({Key? key}) : super(key: key);
+  const ChargeCards({Key? key}) : super(key: key);
 
   @override
   State<ChargeCards> createState() => _ChargeCardsState();
@@ -34,10 +34,7 @@ class _ChargeCardsState extends State<ChargeCards> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('كروت الشحن'),
@@ -96,29 +93,16 @@ class _ChargeCardsState extends State<ChargeCards> {
               subtitle:
                   '${controller.items[index].expireAt} | ${controller.items[index].balance} ${controller.items[index].currency}',
               isActive: controller.items[index].isActive!,
-              onTap: () {},
               onEditPressed: () {},
-              onActivePressed: (val) async {
-                try {
-                  controller.items[index].isActive!.value = await controller
-                      .changeState(id: controller.items[index].id!, state: val);
-                  showSnackBar(
-                      message: 'تم تعديل حالة الكرت', type: AlertType.success);
-                } on ResponseError catch (e) {
-                  showSnackBar(message: e.message, type: AlertType.failure);
-                }
+              onActivePressed: (val) {
+                controller.changeState(index: index, state: !val);
               },
               onDeletePressed: () async {
-                try {
-                  await controller.deleteCode(controller.items[index].id!);
-                  showSnackBar(
-                      message: 'تم حذف ${controller.items[index].card} بنجاح',
-                      type: AlertType.success);
+                bool deleted = await controller.deleteCode(index);
+                if (deleted) {
                   setState(() {
                     controller.items.removeAt(index);
                   });
-                } on ResponseError catch (e) {
-                  showSnackBar(message: e.message, type: AlertType.failure);
                 }
               },
             ),

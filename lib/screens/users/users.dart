@@ -12,7 +12,7 @@ import '../../utilities/appearance/style.dart';
 import '../../widgets/custom_alert_dialog.dart';
 import '../../widgets/custom_textfield.dart';
 import '../../widgets/infinite_list.dart';
-import '../../widgets/progress_button.dart';
+import '../locations/widgets/progress_button.dart';
 import 'models/user.dart';
 
 class Users extends StatefulWidget {
@@ -157,8 +157,6 @@ class _UsersState extends State<Users> {
 
     bool obscurePassword = true;
 
-    ButtonState state = ButtonState.idle;
-
     User? user = await showGetBottomSheet(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       title: 'إضافة مستخدم',
@@ -265,49 +263,29 @@ class _UsersState extends State<Users> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      CustomProgressButton(
-                        state: state,
+                      LocationProgressButton(
                         confirmText: 'إضافة',
+                        successMessage: 'تم أضافة المستخدم بنجاح',
+                        formKey: formKey,
                         onPressed: () async {
-                          if (formKey.currentState!.validate()) {
-                            setState(() {
-                              state = ButtonState.loading;
-                            });
-                            try {
-                              User user = User(
-                                id: '',
-                                name: name.text.trim(),
-                                username: username.text.trim(),
-                                isVerified: false,
-                                verifiedAt: '',
-                                isActive: RxBool(true),
-                              );
-                              String id = await api.post(
-                                'AddUser',
-                                data: {
-                                  'name': user.name,
-                                  'email': email.text.trim(),
-                                  'username': user.username,
-                                  'password': password.text.trim(),
-                                  'privateCode': privateCode.text.trim(),
-                                },
-                              );
-                              user.id = id;
-                              Get.back(result: user);
-                              showSnackBar(
-                                  message: 'تم الإضافة بنجاح',
-                                  type: AlertType.success);
-                            } on ResponseError catch (e) {
-                              showSnackBar(
-                                title: 'فشل الإضافة',
-                                message: e.message,
-                                type: AlertType.failure,
-                              );
-                              setState(() {
-                                state = ButtonState.fail;
-                              });
-                            }
-                          }
+                          User user = User(
+                            id: '',
+                            name: name.text.trim(),
+                            username: username.text.trim(),
+                            isVerified: false,
+                            verifiedAt: '',
+                            isActive: RxBool(true),
+                          );
+                          return await api.post(
+                            'AddUser',
+                            data: {
+                              'name': user.name,
+                              'email': email.text.trim(),
+                              'username': user.username,
+                              'password': password.text.trim(),
+                              'privateCode': privateCode.text.trim(),
+                            },
+                          );
                         },
                       )
                     ],

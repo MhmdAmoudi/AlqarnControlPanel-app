@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../service/go_main_screen.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 import '../home/home.dart';
 
 class Notifications extends StatelessWidget {
@@ -11,10 +12,7 @@ class Notifications extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('الإعلانات'),

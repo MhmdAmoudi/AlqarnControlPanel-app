@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:manage/utilities/appearance/style.dart';
 
-import '../../../widgets/drawer/sections_drawer.dart';
+import '../../../widgets/drawer/menu_drawer.dart';
 
 class DrawerTile extends StatelessWidget {
   const DrawerTile({
@@ -19,15 +21,25 @@ class DrawerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(MenuDrawer.selectedSectionIndex == index ? selectedIcon : unselectedIcon),
-      title: Text(title),
-      style: ListTileStyle.drawer,
-      selected: MenuDrawer.selectedSectionIndex == index,
-      onTap: () {
-        MenuDrawer.selectedSectionIndex = index;
-        onTap();
-      },
+    return Card(
+      color: MenuDrawer.selectedSectionIndex == index
+          ? AppColors.mainColor
+          : AppColors.darkMainColor,
+      child: ListTile(
+        leading: Icon(MenuDrawer.selectedSectionIndex == index
+            ? selectedIcon
+            : unselectedIcon),
+        title: Text(title),
+        style: ListTileStyle.drawer,
+        onTap: () {
+          if (MenuDrawer.selectedSectionIndex == index) {
+            Get.back();
+          } else {
+            MenuDrawer.selectedSectionIndex = index;
+            onTap();
+          }
+        },
+      ),
     );
   }
 }

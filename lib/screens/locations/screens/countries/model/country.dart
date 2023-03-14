@@ -1,13 +1,16 @@
 import 'dart:io';
 
+import 'package:get/get.dart';
+
 class Country {
   String? id;
   File? image;
   String name;
   String symbol;
   String code;
+  int counties;
   bool haveImage;
-  bool isActive;
+  RxBool isActive;
 
   Country({
     required this.id,
@@ -15,6 +18,7 @@ class Country {
     required this.name,
     required this.symbol,
     required this.code,
+    required this.counties,
     required this.haveImage,
     required this.isActive,
   });
@@ -26,8 +30,9 @@ class Country {
               name: e['name'],
               symbol: e['symbol'],
               code: e['code'],
+              counties: e['counties'],
               haveImage: e['haveImage'],
-              isActive: e['isActive'],
+              isActive: RxBool(e['isActive']),
             ))
         .toList();
   }

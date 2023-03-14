@@ -13,10 +13,11 @@ class CardTile extends StatelessWidget {
     required this.subtitle,
     this.subtitleColor,
     required this.isActive,
-    required this.onTap,
+    this.onTap,
     required this.onEditPressed,
     this.onDeletePressed,
     this.onActivePressed,
+    this.trailing,
   }) {
     if (onDeletePressed == null) {
       extentRatio = 0.3;
@@ -30,10 +31,11 @@ class CardTile extends StatelessWidget {
   final String subtitle;
   final Color? subtitleColor;
   final RxBool isActive;
-  final void Function() onTap;
+  final void Function()? onTap;
   final void Function() onEditPressed;
   final void Function()? onDeletePressed;
   final void Function(bool)? onActivePressed;
+  final Widget? trailing;
   late final double extentRatio;
 
   @override
@@ -132,15 +134,32 @@ class CardTile extends StatelessWidget {
           ),
           title: Text(title),
           subtitle: Text(subtitle, style: TextStyle(color: subtitleColor)),
-          trailing: Obx(() => isActive.value
-              ? const Icon(
-                  Icons.check_circle_rounded,
-                  color: Colors.green,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (trailing != null) ...[
+                trailing!,
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0),
+                  child: Text(
+                    '|',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 )
-              : const Icon(
-                  Icons.cancel_rounded,
-                  color: Colors.red,
-                )),
+              ],
+              Obx(
+                () => isActive.value
+                    ? const Icon(
+                        Icons.check_circle_rounded,
+                        color: Colors.green,
+                      )
+                    : const Icon(
+                        Icons.cancel_rounded,
+                        color: Colors.red,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

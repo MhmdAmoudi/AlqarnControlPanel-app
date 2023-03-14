@@ -4,9 +4,9 @@ import 'package:manage/screens/users/users.dart';
 import 'package:manage/widgets/section_card.dart';
 
 import '../../api/api.dart';
-import '../../widgets/drawer/sections_drawer.dart';
+import '../../service/go_main_screen.dart';
+import '../../widgets/drawer/menu_drawer.dart';
 import '../../widgets/error_handler.dart';
-import '../home/home.dart';
 
 class UserTypes extends StatefulWidget {
   const UserTypes({Key? key}) : super(key: key);
@@ -17,7 +17,6 @@ class UserTypes extends StatefulWidget {
 
 class _UserTypesState extends State<UserTypes> {
   final API api = API('User');
-
   late Future<List> getUsersCount;
 
   @override
@@ -30,10 +29,7 @@ class _UserTypesState extends State<UserTypes> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('المستخدمين'),

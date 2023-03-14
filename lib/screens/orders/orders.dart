@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/route_manager.dart';
-import 'package:manage/widgets/drawer/sections_drawer.dart';
+import 'package:manage/widgets/drawer/menu_drawer.dart';
 
+import '../../service/go_main_screen.dart';
 import '../../widgets/infinite_list.dart';
-import '../home/home.dart';
 import 'controller/controller.dart';
 import 'models/order_view.dart';
 import 'views/order_card.dart';
@@ -24,10 +23,7 @@ class _OrdersState extends State<Orders> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: WillPopScope(
-        onWillPop: () async {
-          Get.off(() => const Home());
-          return false;
-        },
+        onWillPop: goMainScreen,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('الطلبات'),

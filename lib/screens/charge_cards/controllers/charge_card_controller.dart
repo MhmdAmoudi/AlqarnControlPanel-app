@@ -16,6 +16,7 @@ import 'package:manage/widgets/animated_snackbar.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:widgets_to_image/widgets_to_image.dart';
 import '../../../api/api.dart';
+import '../../../api/response_error.dart';
 import '../models/charge_card.dart';
 
 class ChargeCardController extends GetxController {
@@ -66,12 +67,27 @@ class ChargeCardController extends GetxController {
     }
   }
 
-  Future<void> deleteCode(String id) async {
-    await _api.delete('DeleteCard/$id');
+  Future<bool> deleteCode(int index) async {
+    try {
+      await _api.delete('DeleteCard/${items[index].id}');
+      showSnackBar(
+          message: 'تم حذف ${items[index].card} بنجاح',
+          type: AlertType.success);
+      return true;
+    } on ResponseError catch (e) {
+      showSnackBar(message: e.message, type: AlertType.failure);
+    }
+    return false;
   }
 
-  Future<bool> changeState({required String id, required bool state}) async {
-    return await _api.post('ChangeCardState', data: {id: state});
+  Future<void> changeState({required int index, required bool state}) async {
+    try {
+      items[index].isActive!.value =
+      await _api.post('ChangeCardState', data: {items[index].id: state});
+      showSnackBar(message: 'تم تعديل حالة الكرت', type: AlertType.success);
+    } on ResponseError catch (e) {
+      showSnackBar(message: e.message, type: AlertType.failure);
+    }
   }
 
   String getDate(DateTime datetime) =>
@@ -146,7 +162,10 @@ class ChargeCardController extends GetxController {
   Future<String?> _createQrImage(Uint8List bytes) async {
     try {
       Directory tempDir = await getTemporaryDirectory();
-      final ts = DateTime.now().millisecondsSinceEpoch.toString();
+      final ts = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString();
       String path = '${tempDir.path}/$ts.png';
       return (await File(path).writeAsBytes(bytes)).path;
     } catch (_) {
@@ -154,8 +173,7 @@ class ChargeCardController extends GetxController {
     }
   }
 
-  Future<void> generateQrPdf(
-    BuildContext context, {
+  Future<void> generateQrPdf(BuildContext context, {
     String? balance,
     String? expireAt,
     List<GlobalKey>? codesKey,
@@ -221,7 +239,7 @@ class ChargeCardController extends GetxController {
             padding: const pw.EdgeInsets.only(bottom: 10),
             decoration: const pw.BoxDecoration(
                 border:
-                    pw.Border(bottom: pw.BorderSide(color: PdfColors.black))),
+                pw.Border(bottom: pw.BorderSide(color: PdfColors.black))),
             child: pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 children: [pw.Image(logo, height: 50)]));
@@ -236,29 +254,30 @@ class ChargeCardController extends GetxController {
               childAspectRatio: 1.16 / 1,
               children: List.generate(
                 images.length,
-                (index) => pw.Column(
-                  mainAxisSize: pw.MainAxisSize.min,
-                  children: [
-                    pw.Expanded(
-                      child: pw.Image(
-                        pw.MemoryImage(
-                          File(images[index]).readAsBytesSync(),
+                    (index) =>
+                    pw.Column(
+                      mainAxisSize: pw.MainAxisSize.min,
+                      children: [
+                        pw.Expanded(
+                          child: pw.Image(
+                            pw.MemoryImage(
+                              File(images[index]).readAsBytesSync(),
+                            ),
+                          ),
                         ),
-                      ),
+                        pw.SizedBox(
+                          height: 15,
+                          width: 85,
+                          child: pw.Row(
+                            children: [
+                              qrImageInfo(expireAt!, ttf),
+                              pw.SizedBox(width: 2),
+                              qrImageInfo(balance, ttf),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
-                    pw.SizedBox(
-                      height: 15,
-                      width: 85,
-                      child: pw.Row(
-                        children: [
-                          qrImageInfo(expireAt!, ttf),
-                          pw.SizedBox(width: 2),
-                          qrImageInfo(balance, ttf),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
               ),
             )
           else
@@ -269,11 +288,12 @@ class ChargeCardController extends GetxController {
               childAspectRatio: 1 / 1,
               children: List.generate(
                 images.length,
-                (index) => pw.Image(
-                  pw.MemoryImage(
-                    File(images[index]).readAsBytesSync(),
-                  ),
-                ),
+                    (index) =>
+                    pw.Image(
+                      pw.MemoryImage(
+                        File(images[index]).readAsBytesSync(),
+                      ),
+                    ),
               ),
             )
         ];

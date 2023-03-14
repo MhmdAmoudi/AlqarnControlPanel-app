@@ -77,9 +77,6 @@ class API {
         case DioErrorType.response:
           switch (e.response?.statusCode) {
             case 400:
-              if (e.response?.data['refreshToken'] != null) {
-                refreshToken(e.response?.data['refreshToken']);
-              }
               if (e.response?.data['message'] != null) {
                 error.message = e.response?.data['message'];
               }
